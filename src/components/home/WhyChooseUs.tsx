@@ -1,4 +1,5 @@
 import { Clock, CreditCard, Headphones, Shield, Star, Users } from "lucide-react";
+import { motion } from "framer-motion";
 
 const reasons = [
   {
@@ -14,12 +15,12 @@ const reasons = [
   {
     icon: Star,
     title: "Personalized Itineraries",
-    description: "Customized travel plans tailored to your preferences and budget.",
+    description: "Customized travel plans tailored to your preferences.",
   },
   {
     icon: Shield,
     title: "Trusted Since 2009",
-    description: "Over 15 years of experience serving thousands of happy travelers.",
+    description: "Over 15 years of experience serving happy travelers.",
   },
   {
     icon: Clock,
@@ -29,34 +30,64 @@ const reasons = [
   {
     icon: Users,
     title: "Expert Team",
-    description: "Experienced travel consultants to guide you every step of the way.",
+    description: "Experienced consultants to guide you every step.",
   },
 ];
 
 export function WhyChooseUs() {
   return (
-    <section className="py-16 md:py-24">
-      <div className="container">
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl">Why Choose Us</h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
-            We're committed to making your travel experience seamless, memorable, and stress-free.
-          </p>
+    <section className="py-20 md:py-28 bg-secondary/50 relative overflow-hidden">
+      {/* Decorative Elements */}
+      <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+
+      <div className="container relative z-10">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <motion.span 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block text-sm font-medium text-primary tracking-widest uppercase mb-4"
+          >
+            Why Red Olive
+          </motion.span>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-bold mb-4"
+          >
+            Why Choose Us
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
+          >
+            We're committed to making your travel experience seamless, memorable, and stress-free
+          </motion.p>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {reasons.map((reason, index) => (
-            <div
+            <motion.div
               key={reason.title}
-              className="text-center animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="text-center group"
             >
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                <reason.icon className="h-8 w-8 text-primary" />
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-card shadow-lg group-hover:shadow-xl transition-shadow border">
+                <reason.icon className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">{reason.title}</h3>
+              <h3 className="mb-3 text-xl font-bold">{reason.title}</h3>
               <p className="text-muted-foreground">{reason.description}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
