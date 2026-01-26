@@ -4,7 +4,7 @@ import { X, ArrowRight, ArrowLeft, Send, Check, Calendar, Users, MapPin } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -50,13 +50,17 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleNext = () => {
-    if (currentStep < 3) {
+  const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (currentStep < 3 && validateStep()) {
       setCurrentStep(currentStep + 1);
     }
   };
 
-  const handlePrev = () => {
+  const handlePrev = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
@@ -133,9 +137,9 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
           <DialogTitle className="text-2xl font-bold text-primary-foreground">
             Book Your Trip
           </DialogTitle>
-          <p className="text-primary-foreground/80 text-sm">
+          <DialogDescription className="text-primary-foreground/80 text-sm">
             Fill in your details and we'll plan your perfect vacation
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         {/* Progress Steps */}
@@ -318,7 +322,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={handlePrev}
+                onClick={(e) => handlePrev(e)}
                 className="rounded-xl"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -331,7 +335,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
             {currentStep < 3 ? (
               <Button
                 type="button"
-                onClick={handleNext}
+                onClick={(e) => handleNext(e)}
                 disabled={!validateStep()}
                 className="rounded-xl"
               >
