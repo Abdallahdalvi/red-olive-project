@@ -13,17 +13,6 @@ export function HeroSection() {
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
       
-      {/* Floating Dots Decoration */}
-      <div className="absolute top-1/4 left-8 flex flex-col gap-3 z-10">
-        {[1, 2, 3].map((num) => (
-          <div key={num} className="flex items-center gap-3">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${num === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-              {num}
-            </div>
-            {num === 1 && <div className="w-px h-12 bg-primary/30 absolute left-4 top-8" />}
-          </div>
-        ))}
-      </div>
 
       <div className="container relative z-10 py-20 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
