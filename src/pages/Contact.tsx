@@ -88,8 +88,8 @@ const Contact = () => {
     {
       icon: MapPin,
       title: "Office",
-      value: "309, 3rd Floor, Crystal Plaza, New Link Rd, opp. Infiniti Mall, Andheri West, Mumbai 400060",
-      link: "https://maps.google.com/?q=Crystal+Plaza+Andheri+West+Mumbai",
+      value: "309, 3rd Floor, Crystal Plaza, New Link Rd, opp. Infiniti Mall, Saraswati Baug, Natwar Nagar, Andheri West, Mumbai, Maharashtra 400060",
+      link: "https://maps.google.com/?q=Crystal+Plaza+New+Link+Road+Andheri+West+Mumbai",
     },
     {
       icon: Clock,

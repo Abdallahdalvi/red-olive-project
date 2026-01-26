@@ -88,7 +88,7 @@ export function ContactCTA() {
                 </div>
                 <div>
                   <h4 className="font-bold text-lg">Visit Us</h4>
-                  <p className="text-muted-foreground max-w-xs">309, 3rd Floor, Crystal Plaza, New Link Rd, opp. Infiniti Mall, Andheri West, Mumbai 400060</p>
+                  <p className="text-muted-foreground max-w-xs">309, 3rd Floor, Crystal Plaza, New Link Rd, opp. Infiniti Mall, Saraswati Baug, Natwar Nagar, Andheri West, Mumbai, Maharashtra 400060</p>
                 </div>
               </div>
             </div>
