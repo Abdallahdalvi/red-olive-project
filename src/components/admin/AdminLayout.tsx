@@ -1,5 +1,5 @@
-import { ReactNode, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { ReactNode } from "react";
+import { Navigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,30 +9,33 @@ interface AdminLayoutProps {
   children: ReactNode;
 }
 
+const isAdminSubdomain = window.location.hostname.startsWith('admin.');
+const loginPath = isAdminSubdomain ? "/login" : "/admin/login";
+const accessDeniedPath = isAdminSubdomain ? "/access-denied" : "/admin/access-denied";
+
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
+  const { user, loading, isAdmin } = useAuth();
 
-  const isAdminSubdomain = window.location.hostname.startsWith('admin.');
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate(isAdminSubdomain ? "/login" : "/admin/login");
-    }
-  }, [user, loading, navigate, isAdminSubdomain]);
-
+  // Show loading spinner while checking auth
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
+  // Not logged in - redirect to login
   if (!user) {
-    return null;
+    return <Navigate to={loginPath} replace />;
   }
 
+  // Logged in but not admin - show access denied
+  if (!isAdmin) {
+    return <Navigate to={accessDeniedPath} replace />;
+  }
+
+  // Logged in and is admin - show dashboard
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">

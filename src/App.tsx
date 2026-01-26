@@ -15,19 +15,15 @@ import AdminPackages from "./pages/admin/Packages";
 import AdminBlogPosts from "./pages/admin/BlogPosts";
 import AdminInquiries from "./pages/admin/Inquiries";
 import AdminTestimonials from "./pages/admin/Testimonials";
+import AccessDenied from "./pages/admin/AccessDenied";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient();
 
 // Check if we're on the admin subdomain
-const isAdminSubdomain = () => {
-  const hostname = window.location.hostname;
-  return hostname.startsWith('admin.');
-};
+const isAdminSubdomain = window.location.hostname.startsWith('admin.');
 
-const App = () => {
-  const isAdmin = isAdminSubdomain();
-
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -36,10 +32,11 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {isAdmin ? (
+              {isAdminSubdomain ? (
                 // Admin subdomain routes - no /admin prefix needed
                 <>
                   <Route path="/login" element={<AdminLogin />} />
+                  <Route path="/access-denied" element={<AccessDenied />} />
                   <Route path="/" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
                   <Route path="/destinations" element={<AdminLayout><AdminDestinations /></AdminLayout>} />
                   <Route path="/packages" element={<AdminLayout><AdminPackages /></AdminLayout>} />
@@ -55,6 +52,7 @@ const App = () => {
                   
                   {/* Admin Routes - also available on main domain */}
                   <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin/access-denied" element={<AccessDenied />} />
                   <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
                   <Route path="/admin/destinations" element={<AdminLayout><AdminDestinations /></AdminLayout>} />
                   <Route path="/admin/packages" element={<AdminLayout><AdminPackages /></AdminLayout>} />
@@ -72,6 +70,6 @@ const App = () => {
       </AuthProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;
