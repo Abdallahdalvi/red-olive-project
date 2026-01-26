@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Eye, Mail, Phone, Calendar, MapPin, Users, MessageSquare } from "lucide-react";
+import { Loader2, Eye, Mail, Phone, Calendar, MapPin, Users, MessageSquare, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,6 +9,55 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+
+// Helper function to convert data to CSV and download as Excel-compatible file
+const exportToExcel = (data: Inquiry[], filename: string) => {
+  const headers = [
+    "Name",
+    "Email", 
+    "Phone",
+    "From (Departure)",
+    "Destination",
+    "Travel Date",
+    "Travelers",
+    "Budget",
+    "Message",
+    "Inquiry Type",
+    "Status",
+    "Source",
+    "Created At"
+  ];
+
+  const csvRows = [
+    headers.join(","),
+    ...data.map(inquiry => [
+      `"${inquiry.name?.replace(/"/g, '""') || ''}"`,
+      `"${inquiry.email?.replace(/"/g, '""') || ''}"`,
+      `"${inquiry.phone?.replace(/"/g, '""') || ''}"`,
+      `"${(inquiry as any).from_city?.replace(/"/g, '""') || ''}"`,
+      `"${inquiry.destination?.replace(/"/g, '""') || ''}"`,
+      `"${inquiry.travel_date ? format(new Date(inquiry.travel_date), 'yyyy-MM-dd') : ''}"`,
+      inquiry.travelers || '',
+      `"${inquiry.budget?.replace(/"/g, '""') || ''}"`,
+      `"${inquiry.message?.replace(/"/g, '""') || ''}"`,
+      `"${inquiry.inquiry_type?.replace(/"/g, '""') || ''}"`,
+      `"${inquiry.status?.replace(/"/g, '""') || ''}"`,
+      `"${inquiry.source?.replace(/"/g, '""') || ''}"`,
+      `"${format(new Date(inquiry.created_at), 'yyyy-MM-dd HH:mm:ss')}"`
+    ].join(","))
+  ];
+
+  const csvContent = csvRows.join("\n");
+  const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${filename}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
 
 interface Inquiry {
   id: string;
@@ -77,24 +126,44 @@ export default function AdminInquiries() {
     ? inquiries 
     : inquiries.filter((i) => i.status === filterStatus);
 
+  const handleExport = () => {
+    if (filteredInquiries.length === 0) {
+      toast({ title: "No data", description: "No inquiries to export", variant: "destructive" });
+      return;
+    }
+    const filename = `inquiries_${format(new Date(), 'yyyy-MM-dd')}`;
+    exportToExcel(filteredInquiries, filename);
+    toast({ title: "Exported!", description: `${filteredInquiries.length} inquiries exported to Excel` });
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold">Inquiries</h2>
           <p className="text-muted-foreground">Manage customer inquiries and leads</p>
         </div>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            {statusOptions.map((s) => (
-              <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            onClick={handleExport}
+            disabled={loading || filteredInquiries.length === 0}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export to Excel
+          </Button>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              {statusOptions.map((s) => (
+                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <Card>
