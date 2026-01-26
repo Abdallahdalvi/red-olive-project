@@ -17,6 +17,7 @@ interface FormData {
   name: string;
   email: string;
   phone: string;
+  from: string;
   destination: string;
   travelDate: string;
   travelers: string;
@@ -37,6 +38,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     name: "",
     email: "",
     phone: "",
+    from: "",
     destination: "",
     travelDate: "",
     travelers: "",
@@ -65,7 +67,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
       return formData.name && formData.email && formData.phone;
     }
     if (currentStep === 2) {
-      return formData.destination;
+      return formData.from && formData.destination;
     }
     return true;
   };
@@ -99,6 +101,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
         name: "",
         email: "",
         phone: "",
+        from: "",
         destination: "",
         travelDate: "",
         travelers: "",
@@ -228,6 +231,17 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                 transition={{ duration: 0.3 }}
                 className="space-y-4"
               >
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">From (Departure City) *</label>
+                  <Input
+                    name="from"
+                    placeholder="Where are you traveling from?"
+                    value={formData.from}
+                    onChange={handleChange}
+                    required
+                    className="h-12 rounded-xl"
+                  />
+                </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Destination *</label>
                   <Input
