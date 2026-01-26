@@ -20,59 +20,90 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    // Helper function to check admin role
-    const checkAdminRole = async (userId: string): Promise<boolean> => {
-      try {
-        const { data, error } = await supabase.rpc('has_role', {
-          _user_id: userId,
-          _role: 'admin'
-        });
-        if (error) {
-          console.error('Error checking admin role:', error);
-          return false;
-        }
-        return !!data;
-      } catch (err) {
-        console.error('Exception checking admin role:', err);
+  // Check if user has admin role using the security definer function
+  const checkAdminRole = async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.rpc('has_role', {
+        _user_id: userId,
+        _role: 'admin'
+      });
+      
+      if (error) {
+        console.error('Error checking admin role:', error.message);
         return false;
+      }
+      
+      return data === true;
+    } catch (err) {
+      console.error('Exception checking admin role:', err);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    let mounted = true;
+
+    // Get initial session
+    const initSession = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+        
+        if (initialSession?.user) {
+          setSession(initialSession);
+          setUser(initialSession.user);
+          const adminStatus = await checkAdminRole(initialSession.user.id);
+          if (mounted) {
+            setIsAdmin(adminStatus);
+          }
+        }
+      } catch (err) {
+        console.error('Error getting session:', err);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    // Set up auth state listener FIRST
+    initSession();
+
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      async (event, newSession) => {
+        if (!mounted) return;
         
-        if (session?.user) {
-          const isAdminUser = await checkAdminRole(session.user.id);
-          setIsAdmin(isAdminUser);
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        
+        if (newSession?.user) {
+          // Don't block on admin check - do it async
+          checkAdminRole(newSession.user.id).then((adminStatus) => {
+            if (mounted) {
+              setIsAdmin(adminStatus);
+              setLoading(false);
+            }
+          });
         } else {
           setIsAdmin(false);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
-    // THEN get the initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        const isAdminUser = await checkAdminRole(session.user.id);
-        setIsAdmin(isAdminUser);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setLoading(false);
+    }
     return { error: error as Error | null };
   };
 
@@ -88,7 +119,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    setLoading(true);
     await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setIsAdmin(false);
+    setLoading(false);
   };
 
   return (
