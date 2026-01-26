@@ -27,7 +27,8 @@ export default function AdminLogin() {
         const { error } = await signIn(formData.email, formData.password);
         if (error) throw error;
         toast({ title: "Welcome back!", description: "Successfully logged in." });
-        navigate("/admin");
+        const isAdminSubdomain = window.location.hostname.startsWith('admin.');
+        navigate(isAdminSubdomain ? "/" : "/admin");
       } else {
         const { error } = await signUp(formData.email, formData.password);
         if (error) throw error;

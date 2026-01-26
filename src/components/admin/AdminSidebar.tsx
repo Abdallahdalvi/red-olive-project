@@ -17,13 +17,16 @@ import {
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.jpg";
 
+const isAdminSubdomain = window.location.hostname.startsWith('admin.');
+const prefix = isAdminSubdomain ? '' : '/admin';
+
 const menuItems = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Destinations", url: "/admin/destinations", icon: MapPin },
-  { title: "Packages", url: "/admin/packages", icon: Package },
-  { title: "Blog Posts", url: "/admin/blog", icon: FileText },
-  { title: "Inquiries", url: "/admin/inquiries", icon: MessageSquare },
-  { title: "Testimonials", url: "/admin/testimonials", icon: Users },
+  { title: "Dashboard", url: `${prefix}/`, icon: LayoutDashboard },
+  { title: "Destinations", url: `${prefix}/destinations`, icon: MapPin },
+  { title: "Packages", url: `${prefix}/packages`, icon: Package },
+  { title: "Blog Posts", url: `${prefix}/blog`, icon: FileText },
+  { title: "Inquiries", url: `${prefix}/inquiries`, icon: MessageSquare },
+  { title: "Testimonials", url: `${prefix}/testimonials`, icon: Users },
 ];
 
 export function AdminSidebar() {
@@ -32,7 +35,7 @@ export function AdminSidebar() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/admin/login");
+    navigate(isAdminSubdomain ? "/login" : "/admin/login");
   };
 
   return (
@@ -57,7 +60,7 @@ export function AdminSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      end={item.url === "/admin"}
+                      end={item.url === prefix + '/' || item.url === '/admin'}
                       className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors hover:bg-muted"
                       activeClassName="bg-primary text-primary-foreground hover:bg-primary"
                     >

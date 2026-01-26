@@ -13,11 +13,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
+  const isAdminSubdomain = window.location.hostname.startsWith('admin.');
+
   useEffect(() => {
     if (!loading && !user) {
-      navigate("/admin/login");
+      navigate(isAdminSubdomain ? "/login" : "/admin/login");
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, isAdminSubdomain]);
 
   if (loading) {
     return (
