@@ -324,7 +324,7 @@ const Contact = () => {
               >
                 <div className="rounded-3xl overflow-hidden shadow-2xl border h-[400px] lg:h-[500px]">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3769.4098567895!2d72.8303!3d19.1364!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b63aceef0c69%3A0x2aa80cf2287df8d7!2sCrystal%20Plaza%2C%20New%20Link%20Rd%2C%20Andheri%20West%2C%20Mumbai%2C%20Maharashtra%20400053!5e0!3m2!1sen!2sin!4v1699000000000!5m2!1sen!2sin"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3769.2!2d72.8358!3d19.1380!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b63aceef0c69%3A0x2aa80cf2287df8d7!2s309%2C%20Crystal%20Plaza%2C%20New%20Link%20Rd%2C%20opp.%20Infiniti%20Mall%2C%20Saraswati%20Baug%2C%20Natwar%20Nagar%2C%20Andheri%20West%2C%20Mumbai%2C%20Maharashtra%20400060!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
