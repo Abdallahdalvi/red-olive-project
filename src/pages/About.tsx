@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { 
-  Users, Target, Heart, Award, Globe, Calendar, 
-  CheckCircle, Star, Plane, MapPin, Shield, Clock
+  Heart, Award, Globe, 
+  CheckCircle, Star, Shield
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -9,33 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-
-const teamMembers = [
-  {
-    name: "Mohammed Dalvi",
-    role: "Founder & CEO",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400",
-    description: "20+ years of experience in the travel industry"
-  },
-  {
-    name: "Fatima Khan",
-    role: "Operations Director",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400",
-    description: "Expert in Hajj & Umrah pilgrimage planning"
-  },
-  {
-    name: "Ahmed Sheikh",
-    role: "Travel Consultant",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
-    description: "Specializes in luxury & honeymoon packages"
-  },
-  {
-    name: "Priya Sharma",
-    role: "Customer Relations",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400",
-    description: "Dedicated to exceptional customer service"
-  }
-];
 
 const values = [
   {
@@ -267,57 +240,6 @@ export default function About() {
                     </div>
                     <h3 className="text-lg font-semibold mb-2">{value.title}</h3>
                     <p className="text-sm text-muted-foreground">{value.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="py-20">
-        <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center max-w-2xl mx-auto mb-12"
-          >
-            <Badge className="mb-4">Our Team</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Meet the Experts Behind Your Journeys
-            </h2>
-            <p className="text-muted-foreground">
-              Our dedicated team of travel professionals is committed to making your 
-              travel experience seamless and memorable.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {teamMembers.map((member, index) => (
-              <motion.div
-                key={member.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="overflow-hidden group hover:shadow-xl transition-all">
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-lg font-semibold text-foreground">{member.name}</h3>
-                      <p className="text-primary font-medium">{member.role}</p>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground">{member.description}</p>
                   </CardContent>
                 </Card>
               </motion.div>
