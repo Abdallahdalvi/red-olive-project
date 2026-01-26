@@ -68,7 +68,7 @@ export function ContactCTA() {
                 </div>
                 <div>
                   <h4 className="font-bold text-lg">Call Us</h4>
-                  <p className="text-muted-foreground">+91 98765 43210</p>
+                  <p className="text-muted-foreground">+91 93268 99470</p>
                 </div>
               </div>
 
@@ -88,13 +88,13 @@ export function ContactCTA() {
                 </div>
                 <div>
                   <h4 className="font-bold text-lg">Visit Us</h4>
-                  <p className="text-muted-foreground">123 Travel Street, Mumbai, India - 400001</p>
+                  <p className="text-muted-foreground max-w-xs">309, 3rd Floor, Crystal Plaza, New Link Rd, opp. Infiniti Mall, Andheri West, Mumbai 400060</p>
                 </div>
               </div>
             </div>
 
             <a
-              href="https://wa.me/919876543210"
+              href="https://wa.me/919326899470"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-10 inline-flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-4 text-white font-medium transition-all hover:shadow-lg hover:-translate-y-1"
