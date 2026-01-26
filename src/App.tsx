@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Contact from "./pages/Contact";
+import Packages from "./pages/Packages";
+import Destinations from "./pages/Destinations";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -51,6 +53,8 @@ function App() {
                 <>
                   <Route path="/" element={<Index />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/packages" element={<Packages />} />
+                  <Route path="/destinations" element={<Destinations />} />
                   
                   {/* Admin Routes - also available on main domain */}
                   <Route path="/admin/login" element={<AdminLogin />} />
