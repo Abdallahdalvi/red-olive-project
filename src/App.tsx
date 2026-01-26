@@ -7,7 +7,10 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Contact from "./pages/Contact";
 import Packages from "./pages/Packages";
+import PackageDetail from "./pages/PackageDetail";
 import Destinations from "./pages/Destinations";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -54,7 +57,10 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/packages" element={<Packages />} />
+                  <Route path="/packages/:id" element={<PackageDetail />} />
                   <Route path="/destinations" element={<Destinations />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
                   
                   {/* Admin Routes - also available on main domain */}
                   <Route path="/admin/login" element={<AdminLogin />} />
