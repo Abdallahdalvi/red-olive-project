@@ -21,6 +21,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    // Helper function to check admin role
+    const checkAdminRole = async (userId: string): Promise<boolean> => {
+      try {
+        const { data, error } = await supabase.rpc('has_role', {
+          _user_id: userId,
+          _role: 'admin'
+        });
+        if (error) {
+          console.error('Error checking admin role:', error);
+          return false;
+        }
+        return !!data;
+      } catch (err) {
+        console.error('Exception checking admin role:', err);
+        return false;
+      }
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -28,12 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check admin role using the security definer function
-          const { data } = await supabase.rpc('has_role', {
-            _user_id: session.user.id,
-            _role: 'admin'
-          });
-          setIsAdmin(!!data);
+          const isAdminUser = await checkAdminRole(session.user.id);
+          setIsAdmin(isAdminUser);
         } else {
           setIsAdmin(false);
         }
@@ -43,21 +57,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     // THEN get the initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        supabase.rpc('has_role', {
-          _user_id: session.user.id,
-          _role: 'admin'
-        }).then(({ data }) => {
-          setIsAdmin(!!data);
-          setLoading(false);
-        });
-      } else {
-        setLoading(false);
+        const isAdminUser = await checkAdminRole(session.user.id);
+        setIsAdmin(isAdminUser);
       }
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
