@@ -166,7 +166,7 @@ export function HajjUmrahSection() {
           <Button 
             variant="outline" 
             size="lg" 
-            className="rounded-full px-8 border-white/30 text-white hover:bg-white hover:text-foreground"
+            className="rounded-full px-8 border-2 border-white bg-transparent text-white hover:bg-white hover:text-foreground"
             onClick={() => setIsBookingOpen(true)}
           >
             Get Custom Quote
