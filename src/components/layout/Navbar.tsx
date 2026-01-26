@@ -22,12 +22,8 @@ export function Navbar() {
       <div className="container">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <img src={logo} alt="Red Olive Vacations" className="h-12 w-auto rounded-lg" />
-            <div className="hidden sm:block">
-              <span className="font-bold text-lg text-foreground leading-tight block">Red Olive</span>
-              <span className="text-xs text-muted-foreground">Vacations & Travels</span>
-            </div>
+          <Link to="/" className="flex items-center">
+            <img src={logo} alt="Red Olive Vacations" className="h-14 w-auto rounded-lg" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -46,13 +42,13 @@ export function Navbar() {
 
           {/* Right Actions */}
           <div className="hidden lg:flex items-center gap-4">
-            <a href="tel:+919876543210" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <a href="tel:+919326899470" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                 <Phone className="h-4 w-4 text-primary" />
               </div>
               <div>
                 <span className="text-xs text-muted-foreground block">Call Now</span>
-                <span className="font-semibold text-foreground">+91 98765 43210</span>
+                <span className="font-semibold text-foreground">+91 93268 99470</span>
               </div>
             </a>
             <Button asChild className="rounded-full px-6">
