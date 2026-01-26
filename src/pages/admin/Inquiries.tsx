@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Loader2, Eye, Mail, Phone, Calendar, MapPin, Users, MessageSquare, Download } from "lucide-react";
+import { Loader2, Eye, Mail, Phone, Calendar, MapPin, Users, MessageSquare, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
@@ -88,6 +89,8 @@ export default function AdminInquiries() {
   const [loading, setLoading] = useState(true);
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchInquiries();
@@ -120,6 +123,22 @@ export default function AdminInquiries() {
 
   const getStatusColor = (status: string) => {
     return statusOptions.find((s) => s.value === status)?.color || "bg-gray-100 text-gray-700";
+  };
+
+  const deleteInquiry = async () => {
+    if (!deleteId) return;
+    setIsDeleting(true);
+    
+    const { error } = await supabase.from("inquiries").delete().eq("id", deleteId);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Deleted", description: "Inquiry deleted successfully" });
+      fetchInquiries();
+    }
+    setIsDeleting(false);
+    setDeleteId(null);
   };
 
   const filteredInquiries = filterStatus === "all" 
@@ -211,9 +230,19 @@ export default function AdminInquiries() {
                       </Select>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => setSelectedInquiry(inquiry)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => setSelectedInquiry(inquiry)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => setDeleteId(inquiry.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -326,6 +355,28 @@ export default function AdminInquiries() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Inquiry</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this inquiry? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={deleteInquiry} 
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
