@@ -343,66 +343,66 @@ export default function Packages() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 h-full">
-                        <div className="relative h-52 overflow-hidden">
-                          <img
-                            src={pkg.image_url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600"}
-                            alt={pkg.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                          {pkg.is_featured && (
-                            <Badge className="absolute top-3 left-3 bg-primary">
-                              <Star className="h-3 w-3 mr-1" />
-                              Featured
-                            </Badge>
-                          )}
-                          {pkg.original_price && pkg.original_price > pkg.price && (
-                            <Badge variant="destructive" className="absolute top-3 right-3">
-                              {Math.round(((pkg.original_price - pkg.price) / pkg.original_price) * 100)}% OFF
-                            </Badge>
-                          )}
-                        </div>
-                        <CardContent className="p-5">
-                          {pkg.package_type && (
-                            <Badge variant="secondary" className="mb-2">
-                              {pkg.package_type}
-                            </Badge>
-                          )}
-                          <h3 className="text-lg font-semibold mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                            {pkg.title}
-                          </h3>
-                          {pkg.destination && (
-                            <p className="text-sm text-muted-foreground flex items-center gap-1 mb-3">
-                              <MapPin className="h-4 w-4" />
-                              {pkg.destination.name}, {pkg.destination.country}
-                            </p>
-                          )}
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                            {pkg.duration && (
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
-                                {pkg.duration}
-                              </span>
+                      <Link to={`/packages/${pkg.id}`}>
+                        <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 h-full">
+                          <div className="relative h-52 overflow-hidden">
+                            <img
+                              src={pkg.image_url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600"}
+                              alt={pkg.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                            {pkg.is_featured && (
+                              <Badge className="absolute top-3 left-3 bg-primary">
+                                <Star className="h-3 w-3 mr-1" />
+                                Featured
+                              </Badge>
+                            )}
+                            {pkg.original_price && pkg.original_price > pkg.price && (
+                              <Badge variant="destructive" className="absolute top-3 right-3">
+                                {Math.round(((pkg.original_price - pkg.price) / pkg.original_price) * 100)}% OFF
+                              </Badge>
                             )}
                           </div>
-                          <div className="flex items-center justify-between pt-4 border-t">
-                            <div>
-                              {pkg.original_price && pkg.original_price > pkg.price && (
-                                <span className="text-sm text-muted-foreground line-through mr-2">
-                                  ₹{pkg.original_price.toLocaleString()}
+                          <CardContent className="p-5">
+                            {pkg.package_type && (
+                              <Badge variant="secondary" className="mb-2">
+                                {pkg.package_type}
+                              </Badge>
+                            )}
+                            <h3 className="text-lg font-semibold mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                              {pkg.title}
+                            </h3>
+                            {pkg.destination && (
+                              <p className="text-sm text-muted-foreground flex items-center gap-1 mb-3">
+                                <MapPin className="h-4 w-4" />
+                                {pkg.destination.name}, {pkg.destination.country}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                              {pkg.duration && (
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4" />
+                                  {pkg.duration}
                                 </span>
                               )}
-                              <span className="text-xl font-bold text-primary">
-                                ₹{pkg.price.toLocaleString()}
-                              </span>
-                              <span className="text-sm text-muted-foreground">/person</span>
                             </div>
-                            <Button size="sm" asChild>
-                              <Link to="/contact">Book Now</Link>
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
+                            <div className="flex items-center justify-between pt-4 border-t">
+                              <div>
+                                {pkg.original_price && pkg.original_price > pkg.price && (
+                                  <span className="text-sm text-muted-foreground line-through mr-2">
+                                    ₹{pkg.original_price.toLocaleString()}
+                                  </span>
+                                )}
+                                <span className="text-xl font-bold text-primary">
+                                  ₹{pkg.price.toLocaleString()}
+                                </span>
+                                <span className="text-sm text-muted-foreground">/person</span>
+                              </div>
+                              <Button size="sm">View Details</Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
                     </motion.div>
                   ))}
                 </div>
