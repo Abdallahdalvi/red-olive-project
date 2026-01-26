@@ -94,11 +94,11 @@ export function Footer() {
             <div className="space-y-4 text-background/70 mb-8">
               <p className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0 text-primary" />
-                123 Travel Street, Mumbai, Maharashtra, India - 400001
+                309, 3rd Floor, Crystal Plaza, New Link Rd, opp. Infiniti Mall, Saraswati Baug, Natwar Nagar, Andheri West, Mumbai, Maharashtra 400060
               </p>
               <p className="flex items-center gap-3">
                 <Phone className="h-5 w-5 flex-shrink-0 text-primary" />
-                +91 98765 43210
+                +91 93268 99470
               </p>
               <p className="flex items-center gap-3">
                 <Mail className="h-5 w-5 flex-shrink-0 text-primary" />

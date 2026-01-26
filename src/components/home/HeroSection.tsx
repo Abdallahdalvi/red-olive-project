@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
-import { Search, ArrowRight, Play } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { BookingModal } from "@/components/BookingModal";
 
 export function HeroSection() {
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+
   return (
     <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-secondary via-background to-secondary/50">
       {/* Decorative Elements */}
@@ -49,16 +52,20 @@ export function HeroSection() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="rounded-full px-8 h-14 text-base" asChild>
-                <Link to="/packages">
-                  Book A Trip Now
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+              <Button 
+                size="lg" 
+                className="rounded-full px-8 h-14 text-base"
+                onClick={() => setIsBookingOpen(true)}
+              >
+                Book A Trip Now
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button size="lg" variant="outline" className="rounded-full h-14 w-14 p-0">
                 <Play className="h-5 w-5 ml-1" />
               </Button>
             </div>
+
+            <BookingModal open={isBookingOpen} onOpenChange={setIsBookingOpen} />
 
             {/* Stats Cards */}
             <div className="flex gap-8 pt-8">
