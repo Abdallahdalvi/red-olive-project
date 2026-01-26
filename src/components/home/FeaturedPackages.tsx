@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, MapPin, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 
 const packages = [
   {
@@ -60,83 +61,114 @@ const packages = [
 
 export function FeaturedPackages() {
   return (
-    <section className="py-16 md:py-24 bg-secondary">
+    <section className="py-20 md:py-28 bg-background">
       <div className="container">
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl">Featured Packages</h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
-            Handpicked travel packages with the best value. Book now and save on your dream vacation.
-          </p>
+        {/* Header */}
+        <div className="text-center mb-16">
+          <motion.span 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block text-sm font-medium text-primary tracking-widest uppercase mb-4"
+          >
+            Exclusive Deals
+          </motion.span>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-bold mb-4"
+          >
+            Featured Packages
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
+          >
+            Handpicked travel packages with the best value for your dream vacation
+          </motion.p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Packages Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {packages.map((pkg, index) => (
-            <div
+            <motion.div
               key={pkg.id}
-              className="group overflow-hidden rounded-xl bg-card shadow-md transition-all hover:shadow-xl animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="group"
             >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <img
-                  src={pkg.image}
-                  alt={pkg.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <Badge className="absolute left-3 top-3">{pkg.badge}</Badge>
-                <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-foreground/80 px-2 py-1 text-sm text-background">
-                  <Star className="h-3 w-3 fill-primary text-primary" />
-                  {pkg.rating}
-                </div>
-              </div>
-
-              <div className="p-4">
-                <h3 className="mb-2 text-lg font-semibold line-clamp-1">{pkg.title}</h3>
-                
-                <div className="mb-3 space-y-1 text-sm text-muted-foreground">
-                  <p className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {pkg.destination}
-                  </p>
-                  <p className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    {pkg.duration}
-                  </p>
-                  <p className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    {pkg.groupSize} Persons
-                  </p>
-                </div>
-
-                <div className="mb-3 flex flex-wrap gap-1">
-                  {pkg.highlights.map((highlight) => (
-                    <span
-                      key={highlight}
-                      className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground"
-                    >
-                      {highlight}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between border-t pt-3">
-                  <div>
-                    <span className="text-lg font-bold text-primary">{pkg.price}</span>
-                    <span className="ml-2 text-sm text-muted-foreground line-through">
-                      {pkg.originalPrice}
-                    </span>
-                    <p className="text-xs text-muted-foreground">per person</p>
+              <div className="overflow-hidden rounded-3xl bg-card shadow-md transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src={pkg.image}
+                    alt={pkg.title}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <Badge className="absolute left-4 top-4 bg-primary">{pkg.badge}</Badge>
+                  <div className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-card/95 px-3 py-1.5 shadow-lg">
+                    <Star className="h-4 w-4 fill-primary text-primary" />
+                    <span className="text-sm font-semibold">{pkg.rating}</span>
                   </div>
-                  <Button size="sm" asChild>
-                    <Link to={`/packages/${pkg.id}`}>Enquire</Link>
-                  </Button>
+                </div>
+
+                <div className="p-5">
+                  <h3 className="mb-3 text-lg font-bold line-clamp-1 group-hover:text-primary transition-colors">
+                    {pkg.title}
+                  </h3>
+                  
+                  <div className="mb-4 space-y-2 text-sm text-muted-foreground">
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      {pkg.destination}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      {pkg.duration}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-primary" />
+                      {pkg.groupSize} Persons
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {pkg.highlights.map((highlight) => (
+                      <span
+                        key={highlight}
+                        className="rounded-full bg-secondary px-2.5 py-1 text-xs text-muted-foreground"
+                      >
+                        {highlight}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <div>
+                      <span className="text-xl font-bold text-primary">{pkg.price}</span>
+                      <span className="ml-2 text-sm text-muted-foreground line-through">
+                        {pkg.originalPrice}
+                      </span>
+                      <p className="text-xs text-muted-foreground">per person</p>
+                    </div>
+                    <Button size="sm" className="rounded-full" asChild>
+                      <Link to={`/packages/${pkg.id}`}>Book</Link>
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         <div className="mt-12 text-center">
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="rounded-full px-8">
             <Link to="/packages">
               View All Packages
               <ArrowRight className="ml-2 h-4 w-4" />
