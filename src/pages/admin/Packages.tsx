@@ -23,6 +23,7 @@ interface Package {
   image_url: string | null;
   is_featured: boolean;
   is_active: boolean;
+  display_order: number | null;
 }
 
 const packageTypes = [
@@ -49,6 +50,7 @@ export default function AdminPackages() {
     image_url: "",
     is_featured: false,
     is_active: true,
+    display_order: "0",
   });
 
   useEffect(() => {
@@ -59,6 +61,7 @@ export default function AdminPackages() {
     const { data, error } = await supabase
       .from("packages")
       .select("*")
+      .order("display_order", { ascending: false })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -82,6 +85,7 @@ export default function AdminPackages() {
       image_url: formData.image_url || null,
       is_featured: formData.is_featured,
       is_active: formData.is_active,
+      display_order: formData.display_order ? parseInt(formData.display_order) : 0,
     };
 
     if (editingId) {
@@ -117,6 +121,7 @@ export default function AdminPackages() {
       image_url: pkg.image_url || "",
       is_featured: pkg.is_featured,
       is_active: pkg.is_active,
+      display_order: pkg.display_order?.toString() || "0",
     });
     setDialogOpen(true);
   };
@@ -145,6 +150,7 @@ export default function AdminPackages() {
       image_url: "",
       is_featured: false,
       is_active: true,
+      display_order: "0",
     });
   };
 
@@ -206,10 +212,14 @@ export default function AdminPackages() {
                 <Label>Image URL</Label>
                 <Input value={formData.image_url} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} />
               </div>
+              <div>
+                <Label>Display Order (Higher = Show First on Homepage)</Label>
+                <Input type="number" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} placeholder="0" />
+              </div>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_featured} onCheckedChange={(checked) => setFormData({ ...formData, is_featured: checked })} />
-                  <Label>Featured</Label>
+                  <Label>Featured (Show on Homepage)</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_active} onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
@@ -238,6 +248,8 @@ export default function AdminPackages() {
                   <TableHead>Duration</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Type</TableHead>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Featured</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -249,6 +261,12 @@ export default function AdminPackages() {
                     <TableCell>{pkg.duration || "-"}</TableCell>
                     <TableCell>₹{pkg.price.toLocaleString()}</TableCell>
                     <TableCell className="capitalize">{pkg.package_type?.replace("_", " ") || "-"}</TableCell>
+                    <TableCell>{pkg.display_order || 0}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${pkg.is_featured ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-500"}`}>
+                        {pkg.is_featured ? "Yes" : "No"}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${pkg.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>
                         {pkg.is_active ? "Active" : "Inactive"}
