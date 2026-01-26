@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Contact from "./pages/Contact";
+import About from "./pages/About";
+import Services from "./pages/Services";
 import Packages from "./pages/Packages";
 import PackageDetail from "./pages/PackageDetail";
 import Destinations from "./pages/Destinations";
@@ -55,6 +57,8 @@ function App() {
                 // Main domain routes
                 <>
                   <Route path="/" element={<Index />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/services" element={<Services />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/packages" element={<Packages />} />
                   <Route path="/packages/:id" element={<PackageDetail />} />
