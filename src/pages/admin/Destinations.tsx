@@ -21,6 +21,7 @@ interface Destination {
   price_from: number | null;
   is_featured: boolean;
   is_active: boolean;
+  display_order: number | null;
 }
 
 export default function AdminDestinations() {
@@ -37,6 +38,7 @@ export default function AdminDestinations() {
     price_from: "",
     is_featured: false,
     is_active: true,
+    display_order: "0",
   });
 
   useEffect(() => {
@@ -47,6 +49,7 @@ export default function AdminDestinations() {
     const { data, error } = await supabase
       .from("destinations")
       .select("*")
+      .order("display_order", { ascending: false })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -69,6 +72,7 @@ export default function AdminDestinations() {
       price_from: formData.price_from ? parseFloat(formData.price_from) : null,
       is_featured: formData.is_featured,
       is_active: formData.is_active,
+      display_order: formData.display_order ? parseInt(formData.display_order) : 0,
     };
 
     if (editingId) {
@@ -103,6 +107,7 @@ export default function AdminDestinations() {
       price_from: dest.price_from?.toString() || "",
       is_featured: dest.is_featured,
       is_active: dest.is_active,
+      display_order: dest.display_order?.toString() || "0",
     });
     setDialogOpen(true);
   };
@@ -130,6 +135,7 @@ export default function AdminDestinations() {
       price_from: "",
       is_featured: false,
       is_active: true,
+      display_order: "0",
     });
   };
 
@@ -172,14 +178,20 @@ export default function AdminDestinations() {
                 <Label>Image URL</Label>
                 <Input value={formData.image_url} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} />
               </div>
-              <div>
-                <Label>Price From (₹)</Label>
-                <Input type="number" value={formData.price_from} onChange={(e) => setFormData({ ...formData, price_from: e.target.value })} />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Price From (₹)</Label>
+                  <Input type="number" value={formData.price_from} onChange={(e) => setFormData({ ...formData, price_from: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Display Order</Label>
+                  <Input type="number" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} placeholder="Higher = show first" />
+                </div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_featured} onCheckedChange={(checked) => setFormData({ ...formData, is_featured: checked })} />
-                  <Label>Featured</Label>
+                  <Label>Featured (Show on Homepage)</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_active} onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
@@ -207,6 +219,8 @@ export default function AdminDestinations() {
                   <TableHead>Name</TableHead>
                   <TableHead>Country</TableHead>
                   <TableHead>Price From</TableHead>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Featured</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -217,6 +231,12 @@ export default function AdminDestinations() {
                     <TableCell className="font-medium">{dest.name}</TableCell>
                     <TableCell>{dest.country}</TableCell>
                     <TableCell>{dest.price_from ? `₹${dest.price_from.toLocaleString()}` : "-"}</TableCell>
+                    <TableCell>{dest.display_order || 0}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${dest.is_featured ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-500"}`}>
+                        {dest.is_featured ? "Yes" : "No"}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${dest.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>
                         {dest.is_active ? "Active" : "Inactive"}
