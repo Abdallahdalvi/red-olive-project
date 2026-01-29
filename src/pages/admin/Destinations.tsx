@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -29,6 +30,9 @@ export default function AdminDestinations() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterFeatured, setFilterFeatured] = useState<string>("all");
+  const [filterActive, setFilterActive] = useState<string>("all");
   const [formData, setFormData] = useState({
     name: "",
     country: "",
@@ -59,6 +63,19 @@ export default function AdminDestinations() {
     }
     setLoading(false);
   }
+
+  const filteredDestinations = destinations.filter((dest) => {
+    const matchesSearch = searchQuery === "" || 
+      dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dest.country.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFeatured = filterFeatured === "all" || 
+      (filterFeatured === "yes" && dest.is_featured) ||
+      (filterFeatured === "no" && !dest.is_featured);
+    const matchesActive = filterActive === "all" || 
+      (filterActive === "yes" && dest.is_active) ||
+      (filterActive === "no" && !dest.is_active);
+    return matchesSearch && matchesFeatured && matchesActive;
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,7 +158,7 @@ export default function AdminDestinations() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-3xl font-bold">Destinations</h2>
           <p className="text-muted-foreground">Manage travel destinations</p>
@@ -204,6 +221,45 @@ export default function AdminDestinations() {
         </Dialog>
       </div>
 
+      {/* Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search destinations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select value={filterFeatured} onValueChange={setFilterFeatured}>
+                <SelectTrigger className="w-36">
+                  <SelectValue placeholder="Featured" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="yes">Featured</SelectItem>
+                  <SelectItem value="no">Not Featured</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterActive} onValueChange={setFilterActive}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="yes">Active</SelectItem>
+                  <SelectItem value="no">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardContent className="p-0">
           {loading ? (
@@ -226,19 +282,19 @@ export default function AdminDestinations() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {destinations.map((dest) => (
+                {filteredDestinations.map((dest) => (
                   <TableRow key={dest.id}>
                     <TableCell className="font-medium">{dest.name}</TableCell>
                     <TableCell>{dest.country}</TableCell>
                     <TableCell>{dest.price_from ? `₹${dest.price_from.toLocaleString()}` : "-"}</TableCell>
                     <TableCell>{dest.display_order || 0}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${dest.is_featured ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-500"}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs ${dest.is_featured ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                         {dest.is_featured ? "Yes" : "No"}
                       </span>
                     </TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${dest.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs ${dest.is_active ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
                         {dest.is_active ? "Active" : "Inactive"}
                       </span>
                     </TableCell>
