@@ -1,60 +1,61 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowLeft, MapPin, Star, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
 
-interface Destination {
-  id: string;
-  name: string;
-  country: string;
-  image_url: string | null;
-  price_from: number | null;
-}
+const destinations = [
+  {
+    id: 1,
+    name: "Maldives Paradise",
+    location: "Maldives",
+    image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?q=80&w=1965&auto=format&fit=crop",
+    rating: 4.9,
+  },
+  {
+    id: 2,
+    name: "Dubai Adventure",
+    location: "UAE",
+    image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format&fit=crop",
+    rating: 4.8,
+  },
+  {
+    id: 3,
+    name: "Bali Retreat",
+    location: "Indonesia",
+    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=1938&auto=format&fit=crop",
+    rating: 4.7,
+  },
+  {
+    id: 4,
+    name: "Swiss Alps",
+    location: "Switzerland",
+    image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?q=80&w=2070&auto=format&fit=crop",
+    rating: 4.9,
+  },
+  {
+    id: 5,
+    name: "Kashmir Valley",
+    location: "India",
+    image: "https://images.unsplash.com/photo-1597074866923-dc0589150a4e?q=80&w=2070&auto=format&fit=crop",
+    rating: 4.8,
+  },
+  {
+    id: 6,
+    name: "Thailand Beach",
+    location: "Thailand",
+    image: "https://images.unsplash.com/photo-1528181304800-259b08848526?q=80&w=2070&auto=format&fit=crop",
+    rating: 4.6,
+  },
+];
 
 export function PopularDestinations() {
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerView = 3;
-
-  useEffect(() => {
-    fetchDestinations();
-  }, []);
-
-  async function fetchDestinations() {
-    const { data, error } = await supabase
-      .from("destinations")
-      .select("id, name, country, image_url, price_from")
-      .eq("is_active", true)
-      .eq("is_featured", true)
-      .order("display_order", { ascending: false })
-      .limit(8);
-
-    if (!error && data) {
-      setDestinations(data);
-    }
-    setLoading(false);
-  }
-
   const maxIndex = Math.max(0, destinations.length - itemsPerView);
+
   const next = () => setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
   const prev = () => setCurrentIndex((prev) => Math.max(prev - 1, 0));
-
-  if (loading) {
-    return (
-      <section className="py-20 md:py-28 bg-background">
-        <div className="container flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </section>
-    );
-  }
-
-  if (destinations.length === 0) {
-    return null;
-  }
 
   return (
     <section className="py-20 md:py-28 bg-background">
@@ -106,13 +107,13 @@ export function PopularDestinations() {
                 className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]"
               >
                 <Link
-                  to={`/destinations`}
+                  to={`/destinations/${destination.id}`}
                   className="group block"
                 >
                   <div className="relative rounded-3xl overflow-hidden bg-card shadow-lg hover:shadow-2xl transition-all duration-500">
                     <div className="aspect-[4/5] overflow-hidden">
                       <img
-                        src={destination.image_url || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop"}
+                        src={destination.image}
                         alt={destination.name}
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
@@ -127,13 +128,12 @@ export function PopularDestinations() {
                       <div className="flex items-center justify-between">
                         <p className="flex items-center gap-1 text-sm text-white/80">
                           <MapPin className="h-4 w-4" />
-                          {destination.country}
+                          {destination.location}
                         </p>
-                        {destination.price_from && (
-                          <div className="bg-card/90 text-foreground px-3 py-1 rounded-full">
-                            <span className="text-sm font-medium">From ₹{destination.price_from.toLocaleString()}</span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 bg-card/90 text-foreground px-3 py-1 rounded-full">
+                          <Star className="h-3 w-3 fill-primary text-primary" />
+                          <span className="text-sm font-medium">{destination.rating}</span>
+                        </div>
                       </div>
                     </div>
                   </div>

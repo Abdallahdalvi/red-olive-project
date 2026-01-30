@@ -82,8 +82,8 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email",
-      value: "info@redolivevnl.com",
-      link: "mailto:info@redolivevnl.com",
+      value: "info@redolivevacations.com",
+      link: "mailto:info@redolivevacations.com",
     },
     {
       icon: MapPin,

@@ -102,7 +102,7 @@ export function Footer() {
               </p>
               <p className="flex items-center gap-3">
                 <Mail className="h-5 w-5 flex-shrink-0 text-primary" />
-                info@redolivevnl.com
+                info@redolivevacations.com
               </p>
             </div>
             <div>

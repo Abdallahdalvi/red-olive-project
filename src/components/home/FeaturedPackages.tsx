@@ -1,74 +1,65 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, MapPin, Star, Users, Loader2 } from "lucide-react";
+import { ArrowRight, Calendar, MapPin, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
-interface Package {
-  id: string;
-  title: string;
-  description: string | null;
-  duration: string | null;
-  price: number;
-  original_price: number | null;
-  package_type: string | null;
-  image_url: string | null;
-  highlights: string[] | null;
-  destination: { name: string; country: string } | null;
-}
-
-const packageTypeBadges: Record<string, string> = {
-  honeymoon: "Honeymoon",
-  family: "Family",
-  hajj_umrah: "Hajj & Umrah",
-  corporate: "Corporate",
-  adventure: "Adventure",
-  group: "Group Tour",
-};
+const packages = [
+  {
+    id: 1,
+    title: "Dubai Deluxe Experience",
+    destination: "Dubai, UAE",
+    duration: "5 Days / 4 Nights",
+    price: "₹65,000",
+    originalPrice: "₹75,000",
+    image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=1974&auto=format&fit=crop",
+    rating: 4.9,
+    groupSize: "2-10",
+    highlights: ["Burj Khalifa", "Desert Safari", "Dubai Mall"],
+    badge: "Best Seller",
+  },
+  {
+    id: 2,
+    title: "Maldives Honeymoon Special",
+    destination: "Maldives",
+    duration: "6 Days / 5 Nights",
+    price: "₹1,20,000",
+    originalPrice: "₹1,40,000",
+    image: "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?q=80&w=1974&auto=format&fit=crop",
+    rating: 5.0,
+    groupSize: "2",
+    highlights: ["Water Villa", "Spa & Wellness", "Snorkeling"],
+    badge: "Honeymoon",
+  },
+  {
+    id: 3,
+    title: "Kashmir Paradise Tour",
+    destination: "Kashmir, India",
+    duration: "7 Days / 6 Nights",
+    price: "₹35,000",
+    originalPrice: "₹42,000",
+    image: "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?q=80&w=2070&auto=format&fit=crop",
+    rating: 4.8,
+    groupSize: "2-15",
+    highlights: ["Shikara Ride", "Gulmarg", "Pahalgam"],
+    badge: "Popular",
+  },
+  {
+    id: 4,
+    title: "Thailand Adventure",
+    destination: "Bangkok & Phuket",
+    duration: "6 Days / 5 Nights",
+    price: "₹45,000",
+    originalPrice: "₹52,000",
+    image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?q=80&w=2039&auto=format&fit=crop",
+    rating: 4.7,
+    groupSize: "2-12",
+    highlights: ["Island Hopping", "Thai Cuisine", "Night Markets"],
+    badge: "Adventure",
+  },
+];
 
 export function FeaturedPackages() {
-  const [packages, setPackages] = useState<Package[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
-  async function fetchPackages() {
-    const { data, error } = await supabase
-      .from("packages")
-      .select(`
-        id, title, description, duration, price, original_price, 
-        package_type, image_url, highlights,
-        destination:destinations(name, country)
-      `)
-      .eq("is_active", true)
-      .eq("is_featured", true)
-      .order("display_order", { ascending: false })
-      .limit(4);
-
-    if (!error && data) {
-      setPackages(data as Package[]);
-    }
-    setLoading(false);
-  }
-
-  if (loading) {
-    return (
-      <section className="py-20 md:py-28 bg-background">
-        <div className="container flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </section>
-    );
-  }
-
-  if (packages.length === 0) {
-    return null;
-  }
-
   return (
     <section className="py-20 md:py-28 bg-background">
       <div className="container">
@@ -116,15 +107,15 @@ export function FeaturedPackages() {
               <div className="overflow-hidden rounded-3xl bg-card shadow-md transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
-                    src={pkg.image_url || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop"}
+                    src={pkg.image}
                     alt={pkg.title}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  {pkg.package_type && (
-                    <Badge className="absolute left-4 top-4 bg-primary">
-                      {packageTypeBadges[pkg.package_type] || pkg.package_type}
-                    </Badge>
-                  )}
+                  <Badge className="absolute left-4 top-4 bg-primary">{pkg.badge}</Badge>
+                  <div className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-card/95 px-3 py-1.5 shadow-lg">
+                    <Star className="h-4 w-4 fill-primary text-primary" />
+                    <span className="text-sm font-semibold">{pkg.rating}</span>
+                  </div>
                 </div>
 
                 <div className="p-5">
@@ -133,41 +124,37 @@ export function FeaturedPackages() {
                   </h3>
                   
                   <div className="mb-4 space-y-2 text-sm text-muted-foreground">
-                    {pkg.destination && (
-                      <p className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-primary" />
-                        {pkg.destination.name}, {pkg.destination.country}
-                      </p>
-                    )}
-                    {pkg.duration && (
-                      <p className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-primary" />
-                        {pkg.duration}
-                      </p>
-                    )}
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      {pkg.destination}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      {pkg.duration}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-primary" />
+                      {pkg.groupSize} Persons
+                    </p>
                   </div>
 
-                  {pkg.highlights && pkg.highlights.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {pkg.highlights.slice(0, 3).map((highlight) => (
-                        <span
-                          key={highlight}
-                          className="rounded-full bg-secondary px-2.5 py-1 text-xs text-muted-foreground"
-                        >
-                          {highlight}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {pkg.highlights.map((highlight) => (
+                      <span
+                        key={highlight}
+                        className="rounded-full bg-secondary px-2.5 py-1 text-xs text-muted-foreground"
+                      >
+                        {highlight}
+                      </span>
+                    ))}
+                  </div>
 
                   <div className="flex items-center justify-between border-t pt-4">
                     <div>
-                      <span className="text-xl font-bold text-primary">₹{pkg.price.toLocaleString()}</span>
-                      {pkg.original_price && (
-                        <span className="ml-2 text-sm text-muted-foreground line-through">
-                          ₹{pkg.original_price.toLocaleString()}
-                        </span>
-                      )}
+                      <span className="text-xl font-bold text-primary">{pkg.price}</span>
+                      <span className="ml-2 text-sm text-muted-foreground line-through">
+                        {pkg.originalPrice}
+                      </span>
                       <p className="text-xs text-muted-foreground">per person</p>
                     </div>
                     <Button size="sm" className="rounded-full" asChild>
