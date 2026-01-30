@@ -78,7 +78,7 @@ export function ContactCTA() {
                 </div>
                 <div>
                   <h4 className="font-bold text-lg">Email Us</h4>
-                  <p className="text-muted-foreground">info@redolivevacations.com</p>
+                  <p className="text-muted-foreground">info@redolivevnl.com</p>
                 </div>
               </div>
 

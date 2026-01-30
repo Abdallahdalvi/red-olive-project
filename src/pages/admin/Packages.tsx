@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -23,6 +23,7 @@ interface Package {
   image_url: string | null;
   is_featured: boolean;
   is_active: boolean;
+  display_order: number | null;
 }
 
 const packageTypes = [
@@ -39,6 +40,10 @@ export default function AdminPackages() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterFeatured, setFilterFeatured] = useState<string>("all");
+  const [filterActive, setFilterActive] = useState<string>("all");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -49,6 +54,7 @@ export default function AdminPackages() {
     image_url: "",
     is_featured: false,
     is_active: true,
+    display_order: "0",
   });
 
   useEffect(() => {
@@ -59,6 +65,7 @@ export default function AdminPackages() {
     const { data, error } = await supabase
       .from("packages")
       .select("*")
+      .order("display_order", { ascending: false })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -68,6 +75,19 @@ export default function AdminPackages() {
     }
     setLoading(false);
   }
+
+  const filteredPackages = packages.filter((pkg) => {
+    const matchesSearch = searchQuery === "" || 
+      pkg.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === "all" || pkg.package_type === filterType;
+    const matchesFeatured = filterFeatured === "all" || 
+      (filterFeatured === "yes" && pkg.is_featured) ||
+      (filterFeatured === "no" && !pkg.is_featured);
+    const matchesActive = filterActive === "all" || 
+      (filterActive === "yes" && pkg.is_active) ||
+      (filterActive === "no" && !pkg.is_active);
+    return matchesSearch && matchesType && matchesFeatured && matchesActive;
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +102,7 @@ export default function AdminPackages() {
       image_url: formData.image_url || null,
       is_featured: formData.is_featured,
       is_active: formData.is_active,
+      display_order: formData.display_order ? parseInt(formData.display_order) : 0,
     };
 
     if (editingId) {
@@ -117,6 +138,7 @@ export default function AdminPackages() {
       image_url: pkg.image_url || "",
       is_featured: pkg.is_featured,
       is_active: pkg.is_active,
+      display_order: pkg.display_order?.toString() || "0",
     });
     setDialogOpen(true);
   };
@@ -145,12 +167,13 @@ export default function AdminPackages() {
       image_url: "",
       is_featured: false,
       is_active: true,
+      display_order: "0",
     });
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-3xl font-bold">Packages</h2>
           <p className="text-muted-foreground">Manage travel packages</p>
@@ -206,10 +229,14 @@ export default function AdminPackages() {
                 <Label>Image URL</Label>
                 <Input value={formData.image_url} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} />
               </div>
+              <div>
+                <Label>Display Order (Higher = Show First on Homepage)</Label>
+                <Input type="number" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} placeholder="0" />
+              </div>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_featured} onCheckedChange={(checked) => setFormData({ ...formData, is_featured: checked })} />
-                  <Label>Featured</Label>
+                  <Label>Featured (Show on Homepage)</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_active} onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
@@ -221,6 +248,56 @@ export default function AdminPackages() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search packages..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-36">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  {packageTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterFeatured} onValueChange={setFilterFeatured}>
+                <SelectTrigger className="w-36">
+                  <SelectValue placeholder="Featured" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="yes">Featured</SelectItem>
+                  <SelectItem value="no">Not Featured</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterActive} onValueChange={setFilterActive}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="yes">Active</SelectItem>
+                  <SelectItem value="no">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="p-0">
@@ -238,19 +315,27 @@ export default function AdminPackages() {
                   <TableHead>Duration</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Type</TableHead>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Featured</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {packages.map((pkg) => (
+                {filteredPackages.map((pkg) => (
                   <TableRow key={pkg.id}>
                     <TableCell className="font-medium">{pkg.title}</TableCell>
                     <TableCell>{pkg.duration || "-"}</TableCell>
                     <TableCell>₹{pkg.price.toLocaleString()}</TableCell>
                     <TableCell className="capitalize">{pkg.package_type?.replace("_", " ") || "-"}</TableCell>
+                    <TableCell>{pkg.display_order || 0}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${pkg.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs ${pkg.is_featured ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                        {pkg.is_featured ? "Yes" : "No"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${pkg.is_active ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
                         {pkg.is_active ? "Active" : "Inactive"}
                       </span>
                     </TableCell>
