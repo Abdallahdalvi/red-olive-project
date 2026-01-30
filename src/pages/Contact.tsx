@@ -15,6 +15,7 @@ const Contact = () => {
     name: "",
     email: "",
     phone: "",
+    fromCity: "",
     destination: "",
     travelDate: "",
     travelers: "",
@@ -24,14 +25,20 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    // Read directly from DOM to handle browser autofill
+    const form = e.currentTarget;
+    const fromCityInput = form.querySelector<HTMLInputElement>('input[name="fromCity"]');
+    const fromCityValue = fromCityInput?.value || formData.fromCity;
 
     const { error } = await supabase.from("inquiries").insert({
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
+      from_city: fromCityValue || null,
       destination: formData.destination,
       travel_date: formData.travelDate || null,
       travelers: formData.travelers ? parseInt(formData.travelers) : null,
@@ -57,6 +64,7 @@ const Contact = () => {
         name: "",
         email: "",
         phone: "",
+        fromCity: "",
         destination: "",
         travelDate: "",
         travelers: "",
@@ -205,15 +213,25 @@ const Contact = () => {
                     />
                   </div>
 
-                  <Input
-                    name="email"
-                    type="email"
-                    placeholder="Email Address *"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="h-12 rounded-xl"
-                  />
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="Email Address *"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="h-12 rounded-xl"
+                    />
+                    <Input
+                      name="fromCity"
+                      placeholder="From (Departure City) *"
+                      value={formData.fromCity}
+                      onChange={handleChange}
+                      required
+                      className="h-12 rounded-xl"
+                    />
+                  </div>
 
                   <div className="grid gap-5 sm:grid-cols-2">
                     <Input
