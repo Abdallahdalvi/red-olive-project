@@ -4,7 +4,7 @@ import { X, ArrowRight, ArrowLeft, Send, Check, Calendar, Users, MapPin } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -50,17 +50,13 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (currentStep < 3 && validateStep()) {
+  const handleNext = () => {
+    if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
 
-  const handlePrev = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handlePrev = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
@@ -76,28 +72,16 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // NOTE: Some browsers can autofill inputs without triggering React onChange.
-      // Read the current DOM value at submit time to avoid saving null.
-      const formEl = e.currentTarget;
-      const fromInput = formEl.elements.namedItem("from") as HTMLInputElement | null;
-      const destinationInput = formEl.elements.namedItem("destination") as HTMLInputElement | null;
-
-      const fromCity = (fromInput?.value ?? formData.from).trim();
-      const destination = (destinationInput?.value ?? formData.destination).trim();
-
-      console.log("Submitting booking with from_city:", fromCity);
-
       const { error } = await supabase.from("inquiries").insert({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        from_city: fromCity || null,
-        destination,
+        destination: formData.destination,
         travel_date: formData.travelDate || null,
         travelers: formData.travelers ? parseInt(formData.travelers) : null,
         budget: formData.budget || null,
@@ -149,9 +133,9 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
           <DialogTitle className="text-2xl font-bold text-primary-foreground">
             Book Your Trip
           </DialogTitle>
-          <DialogDescription className="text-primary-foreground/80 text-sm">
+          <p className="text-primary-foreground/80 text-sm">
             Fill in your details and we'll plan your perfect vacation
-          </DialogDescription>
+          </p>
         </DialogHeader>
 
         {/* Progress Steps */}
@@ -334,7 +318,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={(e) => handlePrev(e)}
+                onClick={handlePrev}
                 className="rounded-xl"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -347,7 +331,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
             {currentStep < 3 ? (
               <Button
                 type="button"
-                onClick={(e) => handleNext(e)}
+                onClick={handleNext}
                 disabled={!validateStep()}
                 className="rounded-xl"
               >

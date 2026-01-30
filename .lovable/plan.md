@@ -1,132 +1,144 @@
 
+# Red Olive Vacations & Travels - Website Plan
 
-## Remove Admin Dashboard & Make Google Sheets the Primary CMS
-
-This plan will remove the admin dashboard from the website and configure Google Sheets as the sole content management interface for your travel business.
-
----
-
-### What Will Change
-
-**Removed from Website:**
-- All admin pages (`/admin/*` routes)
-- Admin subdomain routing logic
-- Admin login/signup functionality
-- "Sync from Sheets" button (no longer needed - syncing will be automatic)
-- Admin components (sidebar, layout)
-
-**Kept on Website:**
-- All public pages (home, packages, destinations, blog, contact, etc.)
-- Authentication hook (may be useful for future features)
-- Edge functions for syncing data
-
-**New Sync Architecture:**
-- Content sync triggered directly from n8n (on schedule or via Google Sheets button)
-- No website admin interface required
+## Design System
+Based on your reference, the website will use:
+- **Font:** DM Sans (Regular, Medium, Bold)
+- **Colors:** 
+  - Primary Dark: #101010 (text, headings)
+  - White: #FFFFFF (backgrounds)
+  - Accent Blue: #2986FE (CTAs, highlights)
+  - Light Gray: #F9F9FB (section backgrounds)
+- **Style:** Premium, clean, mobile-responsive
 
 ---
 
-### Files to Remove
+## Homepage (10+ Sections)
 
-| File/Folder | Purpose |
-|-------------|---------|
-| `src/pages/admin/` (all 8 files) | Admin dashboard pages |
-| `src/components/admin/` (2 files) | Admin layout and sidebar |
+### 1. Navigation Bar
+- Logo on left, menu links (Home, Destinations, Packages, Services, Blog, About, Contact)
+- "Get a Quote" CTA button
+- Mobile hamburger menu
 
----
+### 2. Hero Section
+- Full-width banner with stunning travel imagery
+- Headline: "Explore the World with Red Olive"
+- Search/inquiry form for quick destination lookup
+- Trust badges (years of experience, happy customers)
 
-### Files to Modify
+### 3. Popular Destinations
+- Grid of 6-8 trending destinations (domestic & international)
+- Image cards with destination name and starting price
+- "View All Destinations" button
 
-**1. `src/App.tsx`**
-- Remove all admin route imports
-- Remove all `/admin/*` routes
-- Remove admin subdomain detection logic
-- Keep only public website routes
+### 4. Our Services
+- 6 service cards: Domestic Tours, International Tours, Hajj & Umrah, Honeymoon Packages, Corporate Travel, Visa Assistance
+- Icon + brief description for each
+- Links to detailed service pages
 
-**2. `src/components/home/TestimonialsSection.tsx`**
-- Convert from hardcoded data to fetch from database
-- Display approved testimonials synced from Google Sheets
+### 5. Featured Packages
+- Carousel/grid of 4-6 top-selling packages
+- Package card shows: image, destination, duration, price, highlights
+- "Book Now" / "Enquire" buttons
 
-**3. `src/components/home/BlogSection.tsx`**
-- Convert from hardcoded data to fetch from database
-- Display published blog posts synced from Google Sheets
+### 6. Hajj & Umrah Special Section
+- Dedicated highlight for Islamic pilgrimage services
+- Trust messaging for pilgrims
+- Quick inquiry CTA
 
----
+### 7. Why Choose Us
+- 4-6 reasons: Affordable Pricing, 24/7 Support, Personalized Itineraries, Trusted Since [Year], Easy Visa Processing, etc.
+- Icons with brief descriptions
 
-### New Sync Workflow (Google Sheets Triggered)
+### 8. Customer Testimonials
+- Carousel of happy customer reviews
+- Photo, name, location, and quote
 
-Instead of clicking "Sync from Sheets" in the admin panel, syncing will happen:
+### 9. Latest Blog Posts
+- 3 recent blog cards with image, title, excerpt, date
+- "Read More" links
+- "View All Blogs" button
 
-**Option A: Scheduled Sync (Recommended)**
-- n8n runs every 15-30 minutes
-- Reads data from your Google Sheets
-- Posts to the `sync-sheets-to-db` edge function
+### 10. Statistics/Counter Section
+- Animated counters: 1000+ Happy Travelers, 50+ Destinations, 15+ Years Experience, etc.
 
-**Option B: Manual Button in Google Sheets**
-- Add a custom menu in Google Sheets with Apps Script
-- Click "Sync to Website" to trigger n8n webhook
+### 11. Contact CTA Section
+- "Ready to Plan Your Dream Vacation?"
+- Quick contact form (Name, Phone, Email, Destination Interest)
+- WhatsApp quick connect button
+- Office address and phone number
 
-```text
-+------------------+     +---------+     +---------------------+     +----------+
-| Google Sheets    | --> | n8n     | --> | sync-sheets-to-db   | --> | Database |
-| (Edit Content)   |     | Webhook |     | (Edge Function)     |     |          |
-+------------------+     +---------+     +---------------------+     +----------+
-        ^                                                                  |
-        |                                                                  v
-        +--------------------------------------------------------------+  Website
-                         Inquiries auto-sync via trigger                 (Reads DB)
-```
-
----
-
-### Technical Details
-
-**Cleanup Tasks:**
-1. Remove admin subdomain check (`isAdminSubdomain` variable)
-2. Remove `AuthProvider` wrapper if auth is not needed for public site
-3. Update `NotFound` page to handle any `/admin` routes gracefully
-
-**Dynamic Content Components:**
-Both `TestimonialsSection` and `BlogSection` will be updated to:
-- Fetch data from database using `@tanstack/react-query`
-- Show loading skeletons while fetching
-- Display "No content" gracefully if sheets not synced yet
-
-**Inquiries Still Work:**
-- New inquiries submitted on website automatically sync to Google Sheets
-- Database trigger remains in place
-- n8n webhook continues receiving new leads
+### 12. Footer
+- Logo and tagline
+- Quick links (all pages)
+- Services list
+- Contact info with social media icons
+- Newsletter signup
+- Copyright
 
 ---
 
-### n8n Configuration Required
+## Additional Pages
 
-After removing the admin dashboard, configure n8n to trigger syncs:
+### About Us Page
+- Company story and mission
+- Team section with photos
+- Core values
+- Certifications/partnerships
 
-**For Scheduled Sync:**
-```
-Trigger: Schedule (every 15-30 min)
-  ↓
-Google Sheets: Get rows from each tab
-  ↓
-HTTP Request: POST to sync-sheets-to-db
-  - URL: https://pmyndcfuvcpuuybnyyte.supabase.co/functions/v1/sync-sheets-to-db
-  - Body: { table: "destinations", data: [...], mode: "replace" }
-```
+### Destinations Page
+- Filter by region (India, Middle East, Europe, Southeast Asia, etc.)
+- Destination cards linking to detail pages
 
-**For Manual Google Sheets Button (Optional):**
-Add an Apps Script to your spreadsheet that calls your n8n webhook when you want to sync.
+### Destination Detail Page
+- Destination overview, best time to visit
+- Available packages for that destination
+- Gallery
+- Inquiry form
+
+### Packages Page
+- Filter by type (Honeymoon, Family, Group, Hajj/Umrah, Corporate)
+- Package listing with search/sort
+
+### Package Detail Page
+- Full itinerary (day-by-day)
+- Inclusions/exclusions
+- Pricing table
+- Gallery
+- Inquiry form
+- Related packages
+
+### Services Pages
+- Individual pages for: Hajj & Umrah, Honeymoon, Corporate Travel, Visa Assistance
+- Service details, process, and inquiry form
+
+### Blog Page
+- Blog listing with categories and search
+- Individual blog post pages with social sharing
+
+### Contact Page
+- Contact form
+- Map embed
+- Office locations
+- WhatsApp/phone links
 
 ---
 
-### Summary of Changes
+## Admin Dashboard
 
-| Category | Before | After |
-|----------|--------|-------|
-| Content Management | Admin dashboard + Sheets | Google Sheets only |
-| Sync Trigger | Manual button in admin | n8n scheduled/manual |
-| Website Routes | Public + Admin | Public only |
-| Testimonials | Hardcoded | Database-driven |
-| Blog Section | Hardcoded | Database-driven |
-| Inquiries | Auto-sync to Sheets | No change |
+A password-protected admin panel to manage:
+- **Packages:** Add, edit, delete tour packages with itinerary details
+- **Destinations:** Manage destination listings
+- **Blog Posts:** Create and edit blog articles
+- **Inquiries:** View and manage customer inquiries
+- **Testimonials:** Add/edit customer reviews
+
+---
+
+## Technical Notes
+
+- **Backend Required:** Yes - using Lovable Cloud for database, authentication, and storage
+- **Inquiry Forms:** All forms save to database + optional email notifications
+- **Mobile-First:** Fully responsive design for all devices
+- **Image Management:** Admin can upload images for packages, destinations, and blogs
 
