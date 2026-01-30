@@ -85,6 +85,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
+        from_city: formData.from || null,
         destination: formData.destination,
         travel_date: formData.travelDate || null,
         travelers: formData.travelers ? parseInt(formData.travelers) : null,
