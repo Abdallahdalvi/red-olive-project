@@ -148,7 +148,7 @@ export default function PackageDetail() {
       travel_date: formData.travel_date || null,
       message: `Package Inquiry: ${pkg?.title}\n\n${formData.message}`,
       destination: pkg?.destination?.name || pkg?.title,
-      inquiry_type: "Package Booking",
+      inquiry_type: "booking",
       source: "package_detail"
     });
 
