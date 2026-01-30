@@ -10,6 +10,7 @@ interface InquiryData {
   name: string;
   email: string;
   phone: string | null;
+  from_city: string | null;
   destination: string | null;
   travel_date: string | null;
   travelers: number | null;
@@ -19,6 +20,7 @@ interface InquiryData {
   source: string | null;
   status: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 Deno.serve(async (req) => {
