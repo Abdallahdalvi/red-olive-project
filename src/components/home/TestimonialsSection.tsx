@@ -1,40 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-const testimonials = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    location: "Mumbai, India",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
-    rating: 5,
-    text: "Amazing experience with Red Olive Vacations! Our Kashmir trip was perfectly organized. The team was very professional and responsive throughout our journey. Highly recommended!",
-  },
-  {
-    id: 2,
-    name: "Fatima Khan",
-    location: "Delhi, India",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop",
-    rating: 5,
-    text: "Our Umrah package was exceptional. Everything from visa to accommodation was handled smoothly. The guides were knowledgeable and caring. Will definitely book again!",
-  },
-  {
-    id: 3,
-    name: "Amit Patel",
-    location: "Ahmedabad, India",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop",
-    rating: 5,
-    text: "Best honeymoon package to Maldives! The water villa was breathtaking and all arrangements were top-notch. Thank you Red Olive team for making our trip memorable!",
-  },
-];
+interface Testimonial {
+  id: string;
+  name: string;
+  location: string | null;
+  avatar_url: string | null;
+  rating: number | null;
+  content: string;
+}
 
 export function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const { data: testimonials = [], isLoading } = useQuery({
+    queryKey: ["testimonials-featured"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("id, name, location, avatar_url, rating, content")
+        .eq("is_approved", true)
+        .eq("is_featured", true)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      return data as Testimonial[];
+    },
+  });
+
+  // Reset index when testimonials change
+  useEffect(() => {
+    if (testimonials.length > 0 && currentIndex >= testimonials.length) {
+      setCurrentIndex(0);
+    }
+  }, [testimonials, currentIndex]);
+
   const next = () => setCurrentIndex((prev) => (prev + 1) % testimonials.length);
   const prev = () => setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+
+  if (isLoading) {
+    return (
+      <section className="py-20 md:py-28 bg-background">
+        <div className="container">
+          <div className="text-center mb-16">
+            <Skeleton className="h-4 w-32 mx-auto mb-4" />
+            <Skeleton className="h-10 w-96 mx-auto" />
+          </div>
+          <div className="max-w-4xl mx-auto">
+            <Skeleton className="h-64 w-full rounded-3xl" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return null; // Hide section if no testimonials
+  }
+
+  const currentTestimonial = testimonials[currentIndex];
 
   return (
     <section className="py-20 md:py-28 bg-background relative overflow-hidden">
@@ -81,8 +111,8 @@ export function TestimonialsSection() {
                   <div className="flex-shrink-0">
                     <div className="relative">
                       <img
-                        src={testimonials[currentIndex].image}
-                        alt={testimonials[currentIndex].name}
+                        src={currentTestimonial.avatar_url || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop"}
+                        alt={currentTestimonial.name}
                         className="w-24 h-24 md:w-32 md:h-32 rounded-2xl object-cover"
                       />
                       <div className="absolute -bottom-3 -right-3 bg-primary text-primary-foreground rounded-full p-2">
@@ -94,16 +124,16 @@ export function TestimonialsSection() {
                   {/* Content */}
                   <div className="flex-1 text-center md:text-left">
                     <div className="flex justify-center md:justify-start gap-1 mb-4">
-                      {Array.from({ length: testimonials[currentIndex].rating }).map((_, i) => (
+                      {Array.from({ length: currentTestimonial.rating || 5 }).map((_, i) => (
                         <Star key={i} className="h-5 w-5 fill-primary text-primary" />
                       ))}
                     </div>
                     <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                      "{testimonials[currentIndex].text}"
+                      "{currentTestimonial.content}"
                     </p>
                     <div>
-                      <h4 className="text-lg font-bold">{testimonials[currentIndex].name}</h4>
-                      <p className="text-sm text-muted-foreground">{testimonials[currentIndex].location}</p>
+                      <h4 className="text-lg font-bold">{currentTestimonial.name}</h4>
+                      <p className="text-sm text-muted-foreground">{currentTestimonial.location || "India"}</p>
                     </div>
                   </div>
                 </div>
@@ -111,37 +141,39 @@ export function TestimonialsSection() {
             </AnimatePresence>
 
             {/* Navigation */}
-            <div className="flex items-center justify-center gap-4 mt-8">
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-12 w-12"
-                onClick={prev}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              
-              <div className="flex gap-2">
-                {testimonials.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`h-2 rounded-full transition-all ${
-                      index === currentIndex ? "w-8 bg-primary" : "w-2 bg-primary/20"
-                    }`}
-                    onClick={() => setCurrentIndex(index)}
-                  />
-                ))}
-              </div>
+            {testimonials.length > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-8">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full h-12 w-12"
+                  onClick={prev}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+                
+                <div className="flex gap-2">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`h-2 rounded-full transition-all ${
+                        index === currentIndex ? "w-8 bg-primary" : "w-2 bg-primary/20"
+                      }`}
+                      onClick={() => setCurrentIndex(index)}
+                    />
+                  ))}
+                </div>
 
-              <Button
-                variant="default"
-                size="icon"
-                className="rounded-full h-12 w-12"
-                onClick={next}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-            </div>
+                <Button
+                  variant="default"
+                  size="icon"
+                  className="rounded-full h-12 w-12"
+                  onClick={next}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

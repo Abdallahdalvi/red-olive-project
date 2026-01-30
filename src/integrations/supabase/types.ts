@@ -64,6 +64,7 @@ export type Database = {
           country: string
           created_at: string
           description: string | null
+          display_order: number | null
           id: string
           image_url: string | null
           is_active: boolean | null
@@ -77,6 +78,7 @@ export type Database = {
           country: string
           created_at?: string
           description?: string | null
+          display_order?: number | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -90,6 +92,7 @@ export type Database = {
           country?: string
           created_at?: string
           description?: string | null
+          display_order?: number | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -107,6 +110,7 @@ export type Database = {
           created_at: string
           destination: string | null
           email: string
+          from_city: string | null
           id: string
           inquiry_type: string | null
           message: string | null
@@ -123,6 +127,7 @@ export type Database = {
           created_at?: string
           destination?: string | null
           email: string
+          from_city?: string | null
           id?: string
           inquiry_type?: string | null
           message?: string | null
@@ -139,6 +144,7 @@ export type Database = {
           created_at?: string
           destination?: string | null
           email?: string
+          from_city?: string | null
           id?: string
           inquiry_type?: string | null
           message?: string | null
@@ -157,6 +163,7 @@ export type Database = {
           created_at: string
           description: string | null
           destination_id: string | null
+          display_order: number | null
           duration: string | null
           highlights: string[] | null
           id: string
@@ -173,6 +180,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           destination_id?: string | null
+          display_order?: number | null
           duration?: string | null
           highlights?: string[] | null
           id?: string
@@ -189,6 +197,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           destination_id?: string | null
+          display_order?: number | null
           duration?: string | null
           highlights?: string[] | null
           id?: string

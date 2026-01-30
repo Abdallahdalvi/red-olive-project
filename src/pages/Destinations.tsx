@@ -26,9 +26,10 @@ interface Destination {
 }
 
 const regions = [
-  "Asia",
-  "Europe",
+  "South Asia",
+  "Southeast Asia",
   "Middle East",
+  "Europe",
   "Africa",
   "North America",
   "South America",

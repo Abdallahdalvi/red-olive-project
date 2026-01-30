@@ -76,16 +76,28 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      // NOTE: Some browsers can autofill inputs without triggering React onChange.
+      // Read the current DOM value at submit time to avoid saving null.
+      const formEl = e.currentTarget;
+      const fromInput = formEl.elements.namedItem("from") as HTMLInputElement | null;
+      const destinationInput = formEl.elements.namedItem("destination") as HTMLInputElement | null;
+
+      const fromCity = (fromInput?.value ?? formData.from).trim();
+      const destination = (destinationInput?.value ?? formData.destination).trim();
+
+      console.log("Submitting booking with from_city:", fromCity);
+
       const { error } = await supabase.from("inquiries").insert({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        destination: formData.destination,
+        from_city: fromCity || null,
+        destination,
         travel_date: formData.travelDate || null,
         travelers: formData.travelers ? parseInt(formData.travelers) : null,
         budget: formData.budget || null,
