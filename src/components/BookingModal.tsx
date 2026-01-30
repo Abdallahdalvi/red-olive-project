@@ -81,6 +81,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     setIsSubmitting(true);
 
     try {
+      console.log('Submitting booking with from_city:', formData.from);
       const { error } = await supabase.from("inquiries").insert({
         name: formData.name,
         email: formData.email,
