@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 
   Package, MapPin, FileText, MessageSquare, Users, TrendingUp,
-  ArrowUpRight, Clock, Plus
+  ArrowUpRight, Clock, Plus, RefreshCw
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 
 interface Stats {
   destinations: number;
@@ -46,6 +47,49 @@ export default function AdminDashboard() {
   });
   const [recentInquiries, setRecentInquiries] = useState<RecentInquiry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSyncFromSheets = async () => {
+    const webhookUrl = localStorage.getItem('n8n_sync_webhook_url');
+    
+    if (!webhookUrl) {
+      const url = prompt('Enter your n8n "Sync from Sheets" webhook URL:');
+      if (!url) return;
+      localStorage.setItem('n8n_sync_webhook_url', url);
+    }
+
+    const finalUrl = localStorage.getItem('n8n_sync_webhook_url');
+    if (!finalUrl) return;
+
+    setIsSyncing(true);
+    try {
+      const response = await fetch(finalUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'sync' }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Sync failed: ${response.status}`);
+      }
+
+      localStorage.setItem('last_sheets_sync', new Date().toISOString());
+      
+      toast({
+        title: "Sync Triggered!",
+        description: "n8n is syncing data from Google Sheets. Refresh in a moment to see updates.",
+      });
+    } catch (error) {
+      console.error('Sync error:', error);
+      toast({
+        title: "Sync Failed",
+        description: error instanceof Error ? error.message : "Failed to trigger sync",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -115,6 +159,8 @@ export default function AdminDashboard() {
     { title: "Create Package", icon: Package, link: `${prefix}/packages` },
     { title: "Write Blog Post", icon: FileText, link: `${prefix}/blog` },
   ];
+
+  const lastSyncTime = localStorage.getItem('last_sheets_sync');
 
   const getStatusColor = (status: string | null) => {
     switch (status) {
@@ -292,6 +338,30 @@ export default function AdminDashboard() {
               <p className="text-sm text-muted-foreground">Common tasks</p>
             </CardHeader>
             <CardContent className="space-y-3">
+              {/* Sync from Sheets Button */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.55 }}
+              >
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-12 border-dashed border-2 hover:bg-primary hover:text-primary-foreground transition-all"
+                  onClick={handleSyncFromSheets}
+                  disabled={isSyncing}
+                >
+                  <div className="p-1.5 rounded-md bg-primary/10 mr-3">
+                    <RefreshCw className={`h-4 w-4 text-primary ${isSyncing ? 'animate-spin' : ''}`} />
+                  </div>
+                  {isSyncing ? 'Syncing...' : 'Sync from Sheets'}
+                  {lastSyncTime && !isSyncing && (
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {format(new Date(lastSyncTime), 'MMM d, HH:mm')}
+                    </span>
+                  )}
+                </Button>
+              </motion.div>
+
               {quickActions.map((action, index) => (
                 <motion.div
                   key={action.title}
