@@ -5,6 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
+import Contact from "./pages/Contact";
+import About from "./pages/About";
+import Services from "./pages/Services";
+import Packages from "./pages/Packages";
+import PackageDetail from "./pages/PackageDetail";
+import Destinations from "./pages/Destinations";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -15,19 +23,15 @@ import AdminPackages from "./pages/admin/Packages";
 import AdminBlogPosts from "./pages/admin/BlogPosts";
 import AdminInquiries from "./pages/admin/Inquiries";
 import AdminTestimonials from "./pages/admin/Testimonials";
+import AccessDenied from "./pages/admin/AccessDenied";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient();
 
 // Check if we're on the admin subdomain
-const isAdminSubdomain = () => {
-  const hostname = window.location.hostname;
-  return hostname.startsWith('admin.');
-};
+const isAdminSubdomain = window.location.hostname.startsWith('admin.');
 
-const App = () => {
-  const isAdmin = isAdminSubdomain();
-
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -36,10 +40,11 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {isAdmin ? (
+              {isAdminSubdomain ? (
                 // Admin subdomain routes - no /admin prefix needed
                 <>
                   <Route path="/login" element={<AdminLogin />} />
+                  <Route path="/access-denied" element={<AccessDenied />} />
                   <Route path="/" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
                   <Route path="/destinations" element={<AdminLayout><AdminDestinations /></AdminLayout>} />
                   <Route path="/packages" element={<AdminLayout><AdminPackages /></AdminLayout>} />
@@ -52,9 +57,18 @@ const App = () => {
                 // Main domain routes
                 <>
                   <Route path="/" element={<Index />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/packages" element={<Packages />} />
+                  <Route path="/packages/:id" element={<PackageDetail />} />
+                  <Route path="/destinations" element={<Destinations />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
                   
                   {/* Admin Routes - also available on main domain */}
                   <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin/access-denied" element={<AccessDenied />} />
                   <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
                   <Route path="/admin/destinations" element={<AdminLayout><AdminDestinations /></AdminLayout>} />
                   <Route path="/admin/packages" element={<AdminLayout><AdminPackages /></AdminLayout>} />
@@ -72,6 +86,6 @@ const App = () => {
       </AuthProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;

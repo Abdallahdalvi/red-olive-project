@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
@@ -8,35 +8,45 @@ import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.jpg";
 
+const isAdminSubdomain = window.location.hostname.startsWith('admin.');
+const dashboardPath = isAdminSubdomain ? "/" : "/admin";
+
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, isAdmin, loading } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
+  // Redirect if already logged in and is admin
+  useEffect(() => {
+    if (!loading && user && isAdmin) {
+      navigate(dashboardPath, { replace: true });
+    }
+  }, [user, isAdmin, loading, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
 
     try {
       if (isLogin) {
         const { error } = await signIn(formData.email, formData.password);
         if (error) throw error;
-        toast({ title: "Welcome back!", description: "Successfully logged in." });
-        const isAdminSubdomain = window.location.hostname.startsWith('admin.');
-        navigate(isAdminSubdomain ? "/" : "/admin");
+        // Navigation will happen via useEffect when isAdmin becomes true
+        toast({ title: "Signing in...", description: "Checking access..." });
       } else {
         const { error } = await signUp(formData.email, formData.password);
         if (error) throw error;
         toast({
           title: "Account created!",
-          description: "You can now log in. Note: Admin access requires role assignment.",
+          description: "You can now sign in. Admin access requires role assignment.",
         });
         setIsLogin(true);
+        setSubmitting(false);
       }
     } catch (error: any) {
       toast({
@@ -44,10 +54,18 @@ export default function AdminLogin() {
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
+
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-secondary via-background to-secondary/50">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-secondary via-background to-secondary/50 p-4">
@@ -75,6 +93,7 @@ export default function AdminLogin() {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="pl-12 h-12 rounded-xl"
                 required
+                disabled={submitting}
               />
             </div>
 
@@ -88,11 +107,12 @@ export default function AdminLogin() {
                 className="pl-12 h-12 rounded-xl"
                 required
                 minLength={6}
+                disabled={submitting}
               />
             </div>
 
-            <Button type="submit" className="w-full h-12 rounded-xl" disabled={loading}>
-              {loading ? (
+            <Button type="submit" className="w-full h-12 rounded-xl" disabled={submitting}>
+              {submitting ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <>
@@ -108,6 +128,7 @@ export default function AdminLogin() {
               type="button"
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm text-primary hover:underline"
+              disabled={submitting}
             >
               {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </button>
