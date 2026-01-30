@@ -101,6 +101,7 @@ export default function PackageDetail() {
     name: "",
     email: "",
     phone: "",
+    from_city: "",
     travelers: "2",
     travel_date: "",
     message: ""
@@ -129,14 +130,20 @@ export default function PackageDetail() {
     setLoading(false);
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
+
+    // Read from DOM to handle browser autofill bypassing React state
+    const formEl = e.currentTarget;
+    const fromCityInput = formEl.elements.namedItem("from_city") as HTMLInputElement | null;
+    const fromCity = (fromCityInput?.value ?? formData.from_city).trim();
 
     const { error } = await supabase.from("inquiries").insert({
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
+      from_city: fromCity || null,
       travelers: parseInt(formData.travelers),
       travel_date: formData.travel_date || null,
       message: `Package Inquiry: ${pkg?.title}\n\n${formData.message}`,
@@ -162,6 +169,7 @@ export default function PackageDetail() {
         name: "",
         email: "",
         phone: "",
+        from_city: "",
         travelers: "2",
         travel_date: "",
         message: ""
@@ -477,6 +485,17 @@ export default function PackageDetail() {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="+91 98765 43210"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="from_city">From (Departure City) *</Label>
+                      <Input
+                        id="from_city"
+                        name="from_city"
+                        value={formData.from_city}
+                        onChange={(e) => setFormData({ ...formData, from_city: e.target.value })}
+                        placeholder="Where are you traveling from?"
                         required
                       />
                     </div>
