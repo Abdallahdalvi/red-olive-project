@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DevBanner } from "@/components/layout/DevBanner";
 import logo from "@/assets/logo.jpg";
 
 const navLinks = [
@@ -19,6 +20,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b">
+      <DevBanner />
       <div className="container">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
