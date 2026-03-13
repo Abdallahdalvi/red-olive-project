@@ -1,7 +1,0 @@
-project_id = "pmyndcfuvcpuuybnyyte"
-
-[functions.sync-inquiry-to-sheets]
-verify_jwt = false
-
-[functions.sync-sheets-to-db]
-verify_jwt = false
